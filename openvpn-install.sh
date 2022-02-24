@@ -5,7 +5,7 @@
 mylan="10.202.0.0"
 #注意本服务的客户端可以互相通信 client-to-client
 c2c=0
-#本实例的城市default port 是11940,自己可以修改
+#本实例的监听default port 是11940,自己可以修改
 server_port=11940
 # https://github.com/Nyr/openvpn-install
 #
