@@ -1,0 +1,4 @@
+openvpn 在digitalocean 的主机debian 11 中安装是必须 在主机初台化时选中IPV6
+后期的加的ipv6地址无法转发，
+在DO主机中安装后，将server和client修改成ipv6模式后，马上就可以上网了，没有任何问题
+

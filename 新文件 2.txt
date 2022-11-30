@@ -1,0 +1,43 @@
+/usr/sbin/openvpn --status /run/openvpn-server/status-server.log --status-version 2 --suppress-timestamps --config server.conf
+
+
+
+
+
+
+
+
+Chain POSTROUTING (policy ACCEPT)
+target     prot opt source               destination
+SNAT       all      fddd:1194:1194:1194::/64 !fddd:1194:1194:1194::/64  to:2400:6180:0:d0::ea4:c001
+MASQUERADE  all      anywhere             anywhere
+MASQUERADE  all      anywhere             anywhere
+MASQUERADE  all      fde7:4a3e:2d7d::/64 !fde7:4a3e:2d7d::/64
+SNAT       all      fde7:4a3e:2d7d::/64 !fde7:4a3e:2d7d::/64  to:2400:6180:0:d0::ea4:c001
+SNAT       all      anywhere            !fde7:4a3e:2d7d::/64  to:2400:6180:0:d0::ea4:c001
+
+
+
+
+
+
+Chain POSTROUTING (policy ACCEPT)
+target     prot opt source               destination
+SNAT       all      fddd:1194:1194:1194::/64 !fddd:1194:1194:1194::/64  to:2400:6180:0:d0::11bf:f001
+MASQUERADE  all      anywhere             anywhere  
+
+
+1.加入ipv4 ipv6转发
+inet.ipv6.conf.all.forwarding = 1
+net.ipv4.ip_forward = 1
+
+2.加入masquder
+ip6tables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+
+net.ipv4.ip_forward = 1
+net.ipv6.conf.all.forwarding = 1
+
+
+
