@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+#如果使用IPV6，则必须手工修改服务器端的local的IP地址，以及UDP6协议
 #在/root/目录下准备好openvpn环境变量vars文件
 #注意修改网段10.202.0.0为自已的网段
 mylan="10.202.0.0"
@@ -11,7 +12,7 @@ server_port=11940
 #
 # Copyright (c) 2013 Nyr. Released under the MIT License.
 
-#如果使用IPV6，则必须手工修改服务器端的local的IP地址，以及UDP6协议
+
 
 # Detect Debian users running the script with "sh" instead of bash
 if readlink /proc/$$/exe | grep -q "dash"; then
