@@ -11,6 +11,7 @@ server_port=11940
 #
 # Copyright (c) 2013 Nyr. Released under the MIT License.
 
+#如果使用IPV6，则必须手工修改服务器端的local的IP地址，以及UDP6协议
 
 # Detect Debian users running the script with "sh" instead of bash
 if readlink /proc/$$/exe | grep -q "dash"; then
@@ -576,3 +577,5 @@ else
 		;;
 	esac
 fi
+
+
