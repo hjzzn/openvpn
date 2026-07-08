@@ -1,0 +1,40 @@
+我的服务器地址为ubuntu.tianpeng.online 是ipv6地址 准备使用的openvpn端口为 11940
+请帮助生成服务器端的配置文件和客户端的配置文件
+要求仅完成点点通信，客户端可以通过NAT 访问内网
+
+服务端添加如下指令
+push "route 192.168.5.0 255.255.255.0"
+
+#添加路由信息
+服务端执行NAT转发
+sudo iptables -t nat -A POSTROUTING -s 10.19.0.0/24 -d 192.168.5.0/24 -o br0 -j MASQUERADE
+
+#列出路由信息
+sudo iptables -t nat -L POSTROUTING -n --line-numbers
+
+
+#删除路由信息（循环）
+
+#!/bin/bash
+
+# 获取规则编号（用 awk 一步到位过滤，省去两个 grep）
+rule_number=$(sudo iptables -t nat -L POSTROUTING --line-numbers | awk '/10\.19\.0\.0\/24/ && /192\.168\.5\.0\/24/ {print $1}')
+
+# 安全检查：如果根本没有找到任何规则编号，直接退出，不执行后续循环
+if [ -z "$rule_number" ]; then
+    echo "No matching rules found."
+    exit 0
+fi
+
+# 1. 将变量按行读入数组
+mapfile -t lines <<< "$rule_number"
+
+# 2. 倒序循环数组索引（从后往前删，避免编号错位）
+for ((i=${#lines[@]}-1; i>=0; i--)); do
+    # 修复了方括号 ] 前面的空格问题
+    if [ ! -z "${lines[i]}" ]; then
+        sudo iptables -t nat -D POSTROUTING "${lines[i]}"
+        echo "Rule deleted with number: ${lines[i]}"
+    fi
+done
+~
