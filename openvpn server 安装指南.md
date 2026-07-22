@@ -146,7 +146,7 @@ remote yourdomain.com 1194 udp6
 
 
 
-要让通过 IPv6 连接到 OpenVPN 的客户端能够访问你服务器所在的 IPv4 内网（192.168.5.0/24），需要做两件事：在服务端配置路由推送，以及在服务器上开启系统 IP 转发和 SNAT 转换（因为客户端是 IPv6，需要通过网关转换成内网认识的 IPv4 流量）。
+## 要让通过 IPv6 连接到 OpenVPN 的客户端能够访问你服务器所在的 IPv4 内网（192.168.5.0/24），需要做两件事：在服务端配置路由推送，以及在服务器上开启系统 IP 转发和 SNAT 转换（因为客户端是 IPv6，需要通过网关转换成内网认识的 IPv4 流量）。
 
 请按照以下步骤进行配置：
 
@@ -158,31 +158,34 @@ sudo nano /etc/openvpn/server/server.conf
 在文件中找到（或手动添加）以下 push 指令，告诉客户端自动添加通往内网的路由：
 
 Plaintext
+```
 push "route 192.168.5.0 255.255.255.0"
+```
 保存并退出编辑器。
 
 第二步：开启服务器系统的 IPv4 转发
 由于 OpenVPN 服务器本身充当路由网关，必须允许 Linux 内核转发不同网段之间的流量。
 
 临时开启 IP 转发：
-
+```
 Bash
 sudo sysctl -w net.ipv4.ip_forward=1
+```
 为了让重启后依然生效，编辑 sysctl 配置文件：
-
+```
 Bash
 sudo nano /etc/sysctl.conf
+```
 找到或取消注释下面这一行：
-
 Plaintext
+```
 net.ipv4.ip_forward=1
+```
 保存并退出，然后应用配置：
-
+```
 Bash
 sudo sysctl -p
-
-
-
+```
 
 这份指导专门针对你当前这套系统的**防火墙（`iptables`）配置**进行深度拆解和说明。
 
