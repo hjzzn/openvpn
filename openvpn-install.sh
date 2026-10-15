@@ -3,7 +3,7 @@
 #如果使用IPV6，则必须手工修改服务器端的local的IP地址，以及UDP6协议
 #在/root/目录下准备好openvpn环境变量vars文件
 #注意修改网段10.202.0.0为自已的网段
-mylan="10.202.0.0"
+mylan="10.205.0.0"
 #注意本服务的客户端可以互相通信 client-to-client
 c2c=0
 #本实例的监听default port 是11940,自己可以修改
@@ -210,6 +210,7 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
 	[[ -z "$client" ]] && client="client"
 	echo
+	
 	echo "OpenVPN installation is ready to begin."
 	# Install a firewall if firewalld or iptables are not already available
 	if ! systemctl is-active --quiet firewalld.service && ! hash iptables 2>/dev/null; then
@@ -244,6 +245,7 @@ LimitNPROC=infinity" > /etc/systemd/system/openvpn-server@server.service.d/disab
 	if [[ "$firewall" == "firewalld" ]]; then
 		systemctl enable --now firewalld.service
 	fi
+	
 	# Get easy-rsa
 	easy_rsa_url='https://github.com/OpenVPN/easy-rsa/releases/download/v3.0.8/EasyRSA-3.0.8.tgz'
 	mkdir -p /etc/openvpn/server/easy-rsa/
@@ -251,12 +253,17 @@ LimitNPROC=infinity" > /etc/systemd/system/openvpn-server@server.service.d/disab
 	chown -R root:root /etc/openvpn/server/easy-rsa/
 	cd /etc/openvpn/server/easy-rsa/
 	# Create the PKI, set up the CA and the server and client certificates
-        cp /root/vars ./
+    #cp /root/vars ./
+	export EASYRSA_BATCH=1
+	export EASYRSA_NO_PASS=1
+	
+	./easyrsa clean-all
 	./easyrsa init-pki
 	./easyrsa --batch build-ca nopass
 	EASYRSA_CERT_EXPIRE=3650 ./easyrsa build-server-full server nopass
 	EASYRSA_CERT_EXPIRE=3650 ./easyrsa build-client-full "$client" nopass
 	EASYRSA_CRL_DAYS=3650 ./easyrsa gen-crl
+	
 	# Move the stuff we need
 	cp pki/ca.crt pki/private/ca.key pki/issued/server.crt pki/private/server.key pki/crl.pem /etc/openvpn/server
 	# CRL is read with each client connection, while OpenVPN is dropped to nobody
